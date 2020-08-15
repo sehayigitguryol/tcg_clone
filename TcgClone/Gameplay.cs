@@ -7,33 +7,94 @@ namespace TcgClone
 {
     public class Gameplay
     {
-        public Player ActivePlayer { get; private set; }
+        public List<Player> PlayerList { get; private set; }
 
-        public Player OpponentPlayer { get; private set; }
+        public int ActivePlayerIndex { get; set; }
 
         public int TurnCount { get; private set; }
 
         private readonly Random random = new Random();
 
-        public Gameplay()
+        public Gameplay(Player firstPlayer, Player secondPlayer, int turnCount, int activePlayerIndex)
         {
+            PlayerList = new List<Player>()
+            {
+                firstPlayer,
+                secondPlayer
+            };
 
+            TurnCount = turnCount;
+            ActivePlayerIndex = activePlayerIndex;
+            if (TurnCount == 1)
+            {
+                foreach (var player in PlayerList)
+                {
+                    player.GetStartingHand();
+                }
+            }
         }
 
-        public Gameplay(Player player1, Player player2)
+        public Gameplay(Player firstPlayer, Player secondPlayer)
         {
-            TurnCount = 0;
-            DecideActivePlayer(player1, player2);
-            ActivePlayer.GetStartingHand();
-            OpponentPlayer.GetStartingHand();
+            PlayerList = new List<Player>()
+            {
+                firstPlayer,
+                secondPlayer
+            };
+
+            TurnCount = 1;
+            ActivePlayerIndex = DecideActivePlayer();
+
+            foreach (var player in PlayerList)
+            {
+                player.GetStartingHand();
+            }
         }
 
-        private void DecideActivePlayer(Player player1, Player player2)
+        public void RunGame()
         {
-            int decider = random.Next(2);
+            while (true)
+            {
+                StartTurn();
+            }
+        }
 
-            ActivePlayer = decider == 0 ? player1 : player2;
-            OpponentPlayer = decider == 0 ? player2 : player1;
+        public void StartTurn()
+        {
+            Player activePlayer = GetActivePlayer();
+            activePlayer.IncrementManaCapacity();
+            activePlayer.RefillMana();
+            if (TurnCount != 1)
+            {
+                activePlayer.DrawCard();
+            }
+        }
+
+        public void EndTurn()
+        {
+            SwitchActivePlayer();
+        }
+
+        public void SwitchActivePlayer()
+        {
+            if (ActivePlayerIndex == 0)
+            {
+                ActivePlayerIndex = 1;
+            }
+            else if(ActivePlayerIndex == 1)
+            {
+                ActivePlayerIndex = 0;
+            }
+        }
+
+        public Player GetActivePlayer()
+        {
+            return PlayerList[ActivePlayerIndex];
+        }
+
+        private int DecideActivePlayer()
+        {
+            return random.Next(PlayerList.Count);
         }
 
     }

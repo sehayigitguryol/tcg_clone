@@ -53,7 +53,6 @@ namespace TcgClone.Entities
             Health = MAX_HEALTH;
             Mana = 0;
             ManaCapacity = 0;
-
             Deck = new List<Card>();
             foreach (var item in INITIAL_CARD_COSTS)
             {
