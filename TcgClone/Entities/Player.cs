@@ -11,7 +11,7 @@ namespace TcgClone.Entities
 
         private const int MAX_HAND_SIZE = 5;
 
-        private const int MAX_MANA_SLOTS = 10;
+        private const int MAX_MANA_CAPACITY = 10;
 
         private const int MAX_HEALTH = 30;
 
@@ -25,7 +25,7 @@ namespace TcgClone.Entities
 
         public int Mana { get; set; }
 
-        public int ManaSlots { get; set; }
+        public int ManaCapacity { get; set; }
 
         public List<Card> Deck { get; set; }
 
@@ -42,7 +42,7 @@ namespace TcgClone.Entities
             Name = name;
             Health = health;
             Mana = mana;
-            ManaSlots = manaSlots;
+            ManaCapacity = manaSlots;
             Deck = deck;
             Hand = hand;
         }
@@ -51,7 +51,7 @@ namespace TcgClone.Entities
         {
             Health = MAX_HEALTH;
             Mana = 0;
-            ManaSlots = 0;
+            ManaCapacity = 0;
 
             Deck = new List<Card>();
             foreach (var item in INITIAL_CARD_COSTS)
@@ -87,6 +87,24 @@ namespace TcgClone.Entities
                 }
 
             }
+        }
+
+        public void GetStartingHand()
+        {
+            for (int i = 0; i < INITIAL_HAND_SIZE; i++)
+            {
+                DrawCard();
+            }
+        }
+
+        public void IncrementManaCapacity()
+        {
+            ManaCapacity = ManaCapacity < MAX_MANA_CAPACITY ? ManaCapacity + 1 : MAX_MANA_CAPACITY;
+        }
+
+        public void RefillMana()
+        {
+            Mana = ManaCapacity;
         }
     }
 }
