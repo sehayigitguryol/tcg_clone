@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TcgClone.Entities;
 
 namespace TcgClone.Interfaces
 {
@@ -13,5 +14,11 @@ namespace TcgClone.Interfaces
         void IncrementManaCapacity();
 
         void RefillMana();
+
+        void TakeDamage(int damage);
+
+        void DealDamage(int damage, Player opponent);
+
+        void PlayCard(Card card, Player opponent);
     }
 }

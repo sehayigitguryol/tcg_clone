@@ -106,5 +106,29 @@ namespace TcgClone.Entities
         {
             Mana = ManaCapacity;
         }
+
+        public void TakeDamage(int damage)
+        {
+            Health -= damage;
+        }
+
+        public void DealDamage(int damage, Player opponent)
+        {
+            opponent.TakeDamage(damage);
+        }
+
+        public void PlayCard(Card card, Player opponent)
+        {
+            if (Mana < card.Point)
+            {
+                Console.WriteLine($"{Name} doesn't have sufficient amount of mana to play card {card.Point}");
+            }
+            else
+            {
+                Hand.Remove(card);
+                opponent.TakeDamage(card.Point);
+                Mana -= card.Point;
+            }
+        }
     }
 }

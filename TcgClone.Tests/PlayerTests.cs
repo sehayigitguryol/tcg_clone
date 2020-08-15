@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TcgClone.Entities;
 using Xunit;
+using Xunit.Extensions;
 
 namespace TcgClone.Tests
 {
@@ -144,7 +145,8 @@ namespace TcgClone.Tests
                 new Card(2)
             };
 
-            var hand = new List<Card>() {
+            var hand = new List<Card>()
+            {
 
             };
 
@@ -219,9 +221,9 @@ namespace TcgClone.Tests
         }
 
         [Theory]
-        [InlineData(0,5)]
-        [InlineData(5,7)]
-        [InlineData(7,7)]
+        [InlineData(0, 5)]
+        [InlineData(5, 7)]
+        [InlineData(7, 7)]
         public void RefillMana_Test(int currentMana, int manaCapacity)
         {
             // Arrange
@@ -249,6 +251,140 @@ namespace TcgClone.Tests
             Assert.Equal(manaCapacity, player.Mana);
         }
 
+        [Theory]
+        [InlineData(30, 5)]
+        [InlineData(5, 5)]
+        [InlineData(10, 4)]
+        public void TakeDamage_Test(int health, int damage)
+        {
+            // Arrange
+            var playerName = "Test Player";
+            var currentMana = 1;
+            var manaCapacity = 3;
+            var deck = new List<Card>
+            {
+                new Card(1),
+                new Card(2)
+            };
+
+            var hand = new List<Card>
+            {
+                new Card(1),
+                new Card(2)
+            };
+
+            Player player = CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
+
+            // Act
+            player.TakeDamage(damage);
+
+            // Assert
+            Assert.Equal(health - damage, player.Health);
+        }
+
+        [Fact]
+        public void TakeDamage_RemainingHealthLesserThanDamage_Test()
+        {
+            // Arrange
+            var playerName = "Test Player";
+            var currentMana = 1;
+            var manaCapacity = 3;
+            var health = 3;
+            var deck = new List<Card>
+            {
+                new Card(1),
+                new Card(2)
+            };
+
+            var hand = new List<Card>
+            {
+                new Card(1),
+                new Card(2)
+            };
+
+            Player player = CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
+
+            var damage = 5;
+            // Act
+            player.TakeDamage(damage);
+
+            // Assert
+            Assert.Equal(0, player.Health);
+        }
+
+        [Theory]
+        [InlineData(5)]
+        [InlineData(1)]
+        [InlineData(30)]
+        [InlineData(60)]
+
+        public void DealDamage_Test(int damage)
+        {
+            // Arrange
+
+            Player currentPlayer = CreateMockPlayerWithName("Player 1");
+            Player opponent = CreateMockPlayerWithName("Player 2");
+            // Current opponent health = 30
+
+            var opponentCurrentHealth = opponent.Health;
+
+            // Act
+
+            currentPlayer.DealDamage(damage, opponent);
+
+            // Assert
+
+            Assert.Equal(opponentCurrentHealth - damage, opponent.Health);
+        }
+
+        [Fact]
+        public void PlayCard_InsufficentMana_Test()
+        {
+            // Arrange
+
+            Player player = CreateMockPlayerWithName("player");
+            Player opponent = CreateMockPlayerWithName("opponent");
+
+            player.Mana = 4;
+            player.Hand.Add(new Card(7));
+
+            // Act
+            player.PlayCard(player.Hand.First(), opponent);
+
+            // Assert
+            Assert.Equal(4, player.Mana);
+            Assert.Equal(1, player.Hand.Count);
+            Assert.Equal(30, opponent.Health);
+        }
+
+        [Theory, MemberData(nameof(PlayerHandAndDecisionData))]
+        public void PlayCard_EnoughMana_Test(List<int> handCardPoints, int decidedCard, int playerMana)
+        {
+            // Arrange
+            Player player = CreateMockPlayerWithName("player");
+            player.Mana = playerMana;
+
+            List<Card> hand = handCardPoints.Select((x) => new Card(x)).ToList();
+            player.Hand = new List<Card>(hand);
+
+            Player opponent = CreateMockPlayerWithName("opponent");
+
+            // Act
+            Card selectedCard = player.Hand.Where((x) => x.Point == decidedCard).First();
+
+            player.PlayCard(selectedCard, opponent);
+
+            // Assert
+            Assert.Equal(hand.Count - 1, player.Hand.Count);
+
+            int decidedCardCountInBeginning = hand.Where((x) => x.Point == decidedCard).ToList().Count;
+            int decidedCardCountAfterPlaying = player.Hand.Where((x) => x.Point == decidedCard).ToList().Count;
+
+            Assert.Equal(1, decidedCardCountInBeginning - decidedCardCountAfterPlaying);
+            Assert.Equal(playerMana - decidedCard, player.Mana);
+            Assert.Equal(30 - decidedCard, opponent.Health);
+        }
+
 
         private Player CreateMockPlayerWithName(string name)
         {
@@ -262,5 +398,17 @@ namespace TcgClone.Tests
             return player;
         }
 
+        public static IEnumerable<object[]> PlayerHandAndDecisionData
+        {
+            get
+            {
+                return new[]
+                {
+                    new object[] { new List<int>() { 1, 2, 3 }, 1, 8 },
+                    new object[] { new List<int>() { 1, 2, 2, 4 }, 2 , 8},
+                    new object[] { new List<int>() { 4 , 2, 5, 1 }, 5, 8},
+                 };
+            }
+        }
     }
 }
