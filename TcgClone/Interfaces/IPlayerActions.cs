@@ -20,5 +20,7 @@ namespace TcgClone.Interfaces
         void DealDamage(int damage, Player opponent);
 
         void PlayCard(Card card, Player opponent);
+
+        bool CanPlayAnyMove();
     }
 }

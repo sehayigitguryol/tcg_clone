@@ -356,6 +356,58 @@ namespace TcgClone.Tests
             Assert.Equal(30 - decidedCard, opponent.Health);
         }
 
+        [Fact]
+        public void CanPlayAnyCard_EmptyHand_Test()
+        {
+            // Arrange
+            Player player = CreateMockPlayerWithName("player");
+
+            // Act
+            bool canPlay = player.CanPlayAnyMove();
+
+            // Assert
+            Assert.False(canPlay);
+        }
+
+        [Fact]
+        public void CanPlayAnyCard_InsufficentMana_Test()
+        {
+            // Arrange
+            Player player = CreateMockPlayerWithName("player");
+            player.Mana = 2;
+            player.Hand = new List<Card>()
+            {
+                new Card(4),
+                new Card(5),
+                new Card(3)
+            };
+
+            // Act
+            bool canPlay = player.CanPlayAnyMove();
+
+            // Assert
+            Assert.False(canPlay);
+        }
+
+        [Fact]
+        public void CanPlayAnyCard_EnoughMana_Test()
+        {
+            // Arrange
+            Player player = CreateMockPlayerWithName("player");
+            player.Mana = 8;
+            player.Hand = new List<Card>()
+            {
+                new Card(4),
+                new Card(5),
+                new Card(3)
+            };
+
+            // Act
+            bool canPlay = player.CanPlayAnyMove();
+
+            // Assert
+            Assert.True(canPlay);
+        }
 
         private Player CreateMockPlayerWithName(string name)
         {

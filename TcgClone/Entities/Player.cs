@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TcgClone.Interfaces;
 
@@ -129,6 +130,23 @@ namespace TcgClone.Entities
                 opponent.TakeDamage(card.Point);
                 Mana -= card.Point;
             }
+        }
+
+        public bool CanPlayAnyMove()
+        {
+            if (Hand.Count == 0)
+            {
+                return false;
+            }
+
+            var availableCardsByMana = Hand.Where(x => x.Point <= Mana).ToList();
+
+            if (availableCardsByMana.Count == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
