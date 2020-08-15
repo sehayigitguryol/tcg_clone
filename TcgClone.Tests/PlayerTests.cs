@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TcgClone.Entities;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace TcgClone.Tests
     public class PlayerTests
     {
         [Fact]
-        public void Player_Initialize_Test()
+        public void Player_InitializeDefault_Test()
         {
             // Arrange
             var playerName = "Test Player";
@@ -20,6 +21,17 @@ namespace TcgClone.Tests
             Assert.Equal(30, player.Health);
             Assert.Equal(0, player.Mana);
             Assert.Equal(0, player.ManaSlots);
+
+            Assert.Empty(player.Hand);
+            Assert.Equal(20, player.Deck.Count);
         }
+
+
+        private Player CreateMockPlayerWithName(string name)
+        {
+            Player player = new Player(name);
+            return player;
+        }
+
     }
 }
