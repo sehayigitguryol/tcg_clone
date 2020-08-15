@@ -15,6 +15,11 @@ namespace TcgClone
 
         private readonly Random random = new Random();
 
+        public Gameplay()
+        {
+
+        }
+
         public Gameplay(Player player1, Player player2)
         {
             TurnCount = 0;

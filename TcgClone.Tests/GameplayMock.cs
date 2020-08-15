@@ -11,5 +11,15 @@ namespace TcgClone.Tests
         {
             return new Gameplay(player1, player2);
         }
+
+        public Gameplay CreateMockGameplayWithDecidedSides(Player active, Player defending, int turnCount)
+        {
+            return new Gameplay()
+            {
+                ActivePlayer = active,
+                OpponentPlayer = defending,
+                TurnCount = turnCount
+            };
+        }
     }
 }
