@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TcgClone.Events;
 using TcgClone.Interfaces;
 
 namespace TcgClone.Entities
@@ -110,6 +111,16 @@ namespace TcgClone.Entities
         public void TakeDamage(int damage)
         {
             Health -= damage;
+
+            if (Health <= 0)
+            {
+                PlayerHealthBelowZeroEventArgs args = new PlayerHealthBelowZeroEventArgs()
+                {
+                    LoserPlayer = this
+                };
+
+                OnPlayerHealthBelowZero(args);
+            }
         }
 
         public void DealDamage(int damage, Player opponent)
@@ -194,5 +205,12 @@ namespace TcgClone.Entities
             string input = Console.ReadLine();
             return input;
         }
+
+        private void OnPlayerHealthBelowZero(PlayerHealthBelowZeroEventArgs e)
+        {
+            HealthHandler?.Invoke(this, e);
+        }
+
+        public event PlayerHealthBelowZeroEventHandler HealthHandler;
     }
 }

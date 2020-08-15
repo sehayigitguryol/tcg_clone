@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using TcgClone.Entities;
+using TcgClone.Events;
 
 namespace TcgClone
 {
+    /// <summary>
+    /// Main gameplay logic of the game
+    /// </summary>
     public class Gameplay
     {
         public List<Player> PlayerList { get; private set; }
@@ -13,10 +17,15 @@ namespace TcgClone
 
         public int TurnCount { get; private set; }
 
+        public bool IsGameFinished { get; private set; }
+
         private readonly Random random = new Random();
 
         public Gameplay(Player firstPlayer, Player secondPlayer, int turnCount, int activePlayerIndex)
         {
+            firstPlayer.HealthHandler += Player_HealthBelowZero;
+            secondPlayer.HealthHandler += Player_HealthBelowZero;
+
             PlayerList = new List<Player>()
             {
                 firstPlayer,
@@ -53,29 +62,33 @@ namespace TcgClone
 
         public void RunGame()
         {
-            while (true)
+            while (!IsGameFinished)
             {
-                StartTurn();
-                GetPlayerAction();
+                Player activePlayer = GetActivePlayer();
+                Player defendingPlayer = GetDefendingPlayer();
+
+                StartTurn(activePlayer, defendingPlayer);
+                GetPlayerAction(activePlayer, defendingPlayer);
                 EndTurn();
             }
         }
 
-        public void StartTurn()
+        public void StartTurn(Player activePlayer, Player defendingPlayer)
         {
-            Player activePlayer = GetActivePlayer();
+            Console.WriteLine($"Now it's {activePlayer.Name}'s turn");
             activePlayer.IncrementManaCapacity();
             activePlayer.RefillMana();
             if (TurnCount != 1)
             {
                 activePlayer.DrawCard();
             }
+
+            PrintTurnBeginningStats(activePlayer, defendingPlayer);
         }
 
-        public void GetPlayerAction()
+        public void GetPlayerAction(Player activePlayer, Player defendingPlayer)
         {
-            Player activePlayer = GetActivePlayer();
-            Player defendingPlayer = GetDefendingPlayer();
+            PrintHand(activePlayer);
             while (activePlayer.CanPlayAnyMove())
             {
                 // take input from console
@@ -95,6 +108,7 @@ namespace TcgClone
         public void EndTurn()
         {
             SwitchActivePlayer();
+            TurnCount++;
         }
 
         private void SwitchActivePlayer()
@@ -125,5 +139,38 @@ namespace TcgClone
             return random.Next(PlayerList.Count);
         }
 
+        private void PrintTurnBeginningStats(Player attackingPlayer, Player defendingPlayer)
+        {
+            Console.WriteLine();
+            Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%");
+            Console.WriteLine($"Attacking Player Name : {attackingPlayer.Name}");
+            Console.WriteLine($"Health: {attackingPlayer.Health} Mana: {attackingPlayer.Mana}");
+            Console.WriteLine($"Defending Player Name : {defendingPlayer.Name}");
+            Console.WriteLine($"Health: {attackingPlayer.Health} Mana: {attackingPlayer.Mana}");
+            Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%");
+            Console.WriteLine();
+        }
+
+        private void PrintHand(Player attackingPlayer)
+        {
+            Console.Write("Cards in hand: ");
+            for (int i = 0; i < attackingPlayer.Hand.Count; i++)
+            {
+                if (i != 0)
+                {
+                    Console.Write(" - ");
+                }
+
+                Card card = attackingPlayer.Hand[i];
+                Console.Write($"{card.Point}");
+            }
+
+            Console.WriteLine();
+        }
+
+        private void Player_HealthBelowZero(object sender, PlayerHealthBelowZeroEventArgs e)
+        {
+            IsGameFinished = true;
+        }
     }
 }
