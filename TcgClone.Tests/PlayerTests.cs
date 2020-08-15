@@ -9,6 +9,8 @@ namespace TcgClone.Tests
 {
     public class PlayerTests
     {
+        private readonly PlayerMock playerMock = new PlayerMock();
+
         [Fact]
         public void InitializeDefault_Test()
         {
@@ -40,7 +42,8 @@ namespace TcgClone.Tests
             var deck = new List<Card>();
             var hand = new List<Card>();
 
-            Player player = CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
+            
+            Player player = playerMock.CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
 
             //Act
             player.DrawCard();
@@ -71,7 +74,7 @@ namespace TcgClone.Tests
                 new Card(3)
             };
 
-            Player player = CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
 
             //Act
             player.DrawCard();
@@ -105,7 +108,7 @@ namespace TcgClone.Tests
                 new Card(1)
             };
 
-            Player player = CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(name, health, mana, manaCapacity, deck, hand);
 
             //Act
             player.DrawCard();
@@ -120,7 +123,7 @@ namespace TcgClone.Tests
         {
             // Arrange
             var playerName = "Test Player";
-            Player player = CreateMockPlayerWithName(playerName);
+            Player player = playerMock.CreateMockPlayerWithName(playerName);
 
             // Act
             player.GetStartingHand();
@@ -150,7 +153,7 @@ namespace TcgClone.Tests
 
             };
 
-            Player player = CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
 
             // Act
             player.GetStartingHand();
@@ -181,7 +184,7 @@ namespace TcgClone.Tests
                 new Card(2)
             };
 
-            Player player = CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
 
             // Act
             player.IncrementManaCapacity();
@@ -211,7 +214,7 @@ namespace TcgClone.Tests
                 new Card(2)
             };
 
-            Player player = CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(playerName, health, mana, manaCapacity, deck, hand);
 
             // Act
             player.IncrementManaCapacity();
@@ -242,7 +245,7 @@ namespace TcgClone.Tests
                 new Card(2)
             };
 
-            Player player = CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
 
             // Act
             player.RefillMana();
@@ -274,7 +277,7 @@ namespace TcgClone.Tests
                 new Card(2)
             };
 
-            Player player = CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
+            Player player = playerMock.CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
 
             // Act
             player.TakeDamage(damage);
@@ -293,8 +296,8 @@ namespace TcgClone.Tests
         {
             // Arrange
 
-            Player currentPlayer = CreateMockPlayerWithName("Player 1");
-            Player opponent = CreateMockPlayerWithName("Player 2");
+            Player currentPlayer = playerMock.CreateMockPlayerWithName("Player 1");
+            Player opponent = playerMock.CreateMockPlayerWithName("Player 2");
             // Current opponent health = 30
 
             var opponentCurrentHealth = opponent.Health;
@@ -313,8 +316,8 @@ namespace TcgClone.Tests
         {
             // Arrange
 
-            Player player = CreateMockPlayerWithName("player");
-            Player opponent = CreateMockPlayerWithName("opponent");
+            Player player = playerMock.CreateMockPlayerWithName("player");
+            Player opponent = playerMock.CreateMockPlayerWithName("opponent");
 
             player.Mana = 4;
             player.Hand.Add(new Card(7));
@@ -332,13 +335,13 @@ namespace TcgClone.Tests
         public void PlayCard_EnoughMana_Test(List<int> handCardPoints, int decidedCard, int playerMana)
         {
             // Arrange
-            Player player = CreateMockPlayerWithName("player");
+            Player player = playerMock.CreateMockPlayerWithName("player");
             player.Mana = playerMana;
 
             List<Card> hand = handCardPoints.Select((x) => new Card(x)).ToList();
             player.Hand = new List<Card>(hand);
 
-            Player opponent = CreateMockPlayerWithName("opponent");
+            Player opponent = playerMock.CreateMockPlayerWithName("opponent");
 
             // Act
             Card selectedCard = player.Hand.Where((x) => x.Point == decidedCard).First();
@@ -360,7 +363,7 @@ namespace TcgClone.Tests
         public void CanPlayAnyCard_EmptyHand_Test()
         {
             // Arrange
-            Player player = CreateMockPlayerWithName("player");
+            Player player = playerMock.CreateMockPlayerWithName("player");
 
             // Act
             bool canPlay = player.CanPlayAnyMove();
@@ -373,7 +376,7 @@ namespace TcgClone.Tests
         public void CanPlayAnyCard_InsufficentMana_Test()
         {
             // Arrange
-            Player player = CreateMockPlayerWithName("player");
+            Player player = playerMock.CreateMockPlayerWithName("player");
             player.Mana = 2;
             player.Hand = new List<Card>()
             {
@@ -393,7 +396,7 @@ namespace TcgClone.Tests
         public void CanPlayAnyCard_EnoughMana_Test()
         {
             // Arrange
-            Player player = CreateMockPlayerWithName("player");
+            Player player = playerMock.CreateMockPlayerWithName("player");
             player.Mana = 8;
             player.Hand = new List<Card>()
             {
@@ -407,18 +410,6 @@ namespace TcgClone.Tests
 
             // Assert
             Assert.True(canPlay);
-        }
-
-        private Player CreateMockPlayerWithName(string name)
-        {
-            Player player = new Player(name);
-            return player;
-        }
-
-        private Player CreateMockPlayer(string name, int health, int mana, int manaCapacity, List<Card> deck, List<Card> hand)
-        {
-            Player player = new Player(name, health, mana, manaCapacity, deck, hand);
-            return player;
         }
 
         public static IEnumerable<object[]> PlayerHandAndDecisionData
