@@ -117,6 +117,47 @@ namespace TcgClone.Entities
             opponent.TakeDamage(damage);
         }
 
+        public Card DecideOnCard()
+        {
+            Card selectedCard = null;
+            while (selectedCard == null)
+            {
+                Console.WriteLine("Please give an input");
+                var input = GetPlayerInput();
+                bool isValidInteger = Int32.TryParse(input, out int cardValue);
+                if (!isValidInteger)
+                {
+                    Console.WriteLine($"{input} is invalid");
+                }
+                else
+                {
+                    Card retrievedCard = GetCardFromHand(cardValue);
+                    if (retrievedCard != null)
+                    {
+                        if (cardValue <= Mana)
+                        {
+                            selectedCard = retrievedCard;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{Name} doesn't have sufficient amount of mana to play card {cardValue}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{cardValue} is not on your hand");
+                    }
+                }
+            }
+
+            return selectedCard;
+        }
+
+        private Card GetCardFromHand(int value)
+        {
+            return Hand.FirstOrDefault((x) => x.Point == value);
+        }
+
         public void PlayCard(Card card, Player opponent)
         {
             if (Mana < card.Point)
@@ -146,6 +187,12 @@ namespace TcgClone.Entities
             }
 
             return true;
+        }
+
+        public virtual string GetPlayerInput()
+        {
+            string input = Console.ReadLine();
+            return input;
         }
     }
 }

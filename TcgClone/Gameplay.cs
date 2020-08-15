@@ -56,6 +56,8 @@ namespace TcgClone
             while (true)
             {
                 StartTurn();
+                GetPlayerAction();
+                EndTurn();
             }
         }
 
@@ -70,18 +72,38 @@ namespace TcgClone
             }
         }
 
+        public void GetPlayerAction()
+        {
+            Player activePlayer = GetActivePlayer();
+            Player defendingPlayer = GetDefendingPlayer();
+            while (activePlayer.CanPlayAnyMove())
+            {
+                // take input from console
+                Card decidedCard = activePlayer.DecideOnCard();
+                activePlayer.PlayCard(decidedCard, defendingPlayer);
+            }
+        }
+
+        public void UseCard(Card card)
+        {
+            Player activePlayer = GetActivePlayer();
+            Player defendingPlayer = GetDefendingPlayer();
+
+            activePlayer.PlayCard(card, defendingPlayer);
+        }
+
         public void EndTurn()
         {
             SwitchActivePlayer();
         }
 
-        public void SwitchActivePlayer()
+        private void SwitchActivePlayer()
         {
             if (ActivePlayerIndex == 0)
             {
                 ActivePlayerIndex = 1;
             }
-            else if(ActivePlayerIndex == 1)
+            else if (ActivePlayerIndex == 1)
             {
                 ActivePlayerIndex = 0;
             }
@@ -90,6 +112,12 @@ namespace TcgClone
         public Player GetActivePlayer()
         {
             return PlayerList[ActivePlayerIndex];
+        }
+
+        public Player GetDefendingPlayer()
+        {
+            var defendingIndex = (ActivePlayerIndex + 1) % 2;
+            return PlayerList[defendingIndex];
         }
 
         private int DecideActivePlayer()

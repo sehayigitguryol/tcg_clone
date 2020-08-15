@@ -22,5 +22,9 @@ namespace TcgClone.Interfaces
         void PlayCard(Card card, Player opponent);
 
         bool CanPlayAnyMove();
+
+        Card DecideOnCard();
+
+        string GetPlayerInput();
     }
 }

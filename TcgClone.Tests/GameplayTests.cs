@@ -137,5 +137,6 @@ namespace TcgClone.Tests
             Assert.Equal("Player A", initialActivePlayer.Name);
             Assert.Equal("Player B", activePlayer.Name);
         }
+
     }
 }
