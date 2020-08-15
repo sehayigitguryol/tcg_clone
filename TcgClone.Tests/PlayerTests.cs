@@ -255,6 +255,7 @@ namespace TcgClone.Tests
         [InlineData(30, 5)]
         [InlineData(5, 5)]
         [InlineData(10, 4)]
+        [InlineData(3, 4)]
         public void TakeDamage_Test(int health, int damage)
         {
             // Arrange
@@ -280,36 +281,6 @@ namespace TcgClone.Tests
 
             // Assert
             Assert.Equal(health - damage, player.Health);
-        }
-
-        [Fact]
-        public void TakeDamage_RemainingHealthLesserThanDamage_Test()
-        {
-            // Arrange
-            var playerName = "Test Player";
-            var currentMana = 1;
-            var manaCapacity = 3;
-            var health = 3;
-            var deck = new List<Card>
-            {
-                new Card(1),
-                new Card(2)
-            };
-
-            var hand = new List<Card>
-            {
-                new Card(1),
-                new Card(2)
-            };
-
-            Player player = CreateMockPlayer(playerName, health, currentMana, manaCapacity, deck, hand);
-
-            var damage = 5;
-            // Act
-            player.TakeDamage(damage);
-
-            // Assert
-            Assert.Equal(0, player.Health);
         }
 
         [Theory]
