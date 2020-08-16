@@ -38,7 +38,7 @@ namespace TcgClone.Tests
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 1, 0);
 
             // Act
-            game.StartTurn(player1, player2);
+            game.StartPhase(player1, player2);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();
@@ -72,7 +72,7 @@ namespace TcgClone.Tests
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 2, 0);
 
             // Act
-            game.StartTurn(player1, player2);
+            game.StartPhase(player1, player2);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();
@@ -107,7 +107,7 @@ namespace TcgClone.Tests
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 2, 0);
 
             // Act
-            game.StartTurn(player1, player2);
+            game.StartPhase(player1, player2);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();
@@ -139,7 +139,7 @@ namespace TcgClone.Tests
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 2, 0);
 
             // Act
-            game.StartTurn(player1, player2);
+            game.StartPhase(player1, player2);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();
@@ -173,7 +173,7 @@ namespace TcgClone.Tests
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 2, 0);
 
             // Act
-            game.StartTurn(player1, player2);
+            game.StartPhase(player1, player2);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();
@@ -198,7 +198,7 @@ namespace TcgClone.Tests
             Player initialActivePlayer = game.GetActivePlayer();
 
             // Act
-            game.EndTurn();
+            game.EndPhase(initialActivePlayer);
 
             // Assert
             Player activePlayer = game.GetActivePlayer();

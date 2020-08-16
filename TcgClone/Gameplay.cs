@@ -10,7 +10,7 @@ namespace TcgClone
     /// <summary>
     /// Main gameplay logic of the game
     /// </summary>
-    public class Gameplay
+    public class Gameplay : IPhase
     {
         public List<Player> PlayerList { get; private set; }
 
@@ -75,17 +75,24 @@ namespace TcgClone
                 Player activePlayer = GetActivePlayer();
                 Player defendingPlayer = GetDefendingPlayer();
 
-                StartTurn(activePlayer, defendingPlayer);
-                GetPlayerAction(activePlayer, defendingPlayer);
-                EndTurn();
+                StartPhase(activePlayer, defendingPlayer);
+                ActionPhase(activePlayer, defendingPlayer);
+                EndPhase(activePlayer);
             }
         }
 
-        public void StartTurn(Player activePlayer, Player defendingPlayer)
+        public void StartPhase(Player activePlayer, Player defendingPlayer)
         {
             Console.WriteLine($"Now it's {activePlayer.Name}'s turn");
+            Console.WriteLine("START PHASE");
+            Console.WriteLine();
+
             activePlayer.IncrementManaCapacity();
+            Console.WriteLine($"{activePlayer.Name}'s mana capacity is increased to : {activePlayer.ManaCapacity}");
+
             activePlayer.RefillMana();
+            Console.WriteLine($"{activePlayer.Name}'s mana is refilled");
+
             if (TurnCount != 1)
             {
                 activePlayer.DrawCard();
@@ -94,15 +101,36 @@ namespace TcgClone
             PrintTurnBeginningStats(activePlayer, defendingPlayer);
         }
 
-        public void GetPlayerAction(Player activePlayer, Player defendingPlayer)
+        public void ActionPhase(Player activePlayer, Player defendingPlayer)
         {
+            Console.WriteLine("ACTION PHASE");
+            Console.WriteLine();
+
             PrintHand(activePlayer);
+
+            if (!activePlayer.CanPlayAnyMove())
+            {
+                Console.WriteLine($"No available card to play in {activePlayer.Name}'s hand.");
+                Console.WriteLine();
+            }
+
             while (activePlayer.CanPlayAnyMove())
             {
                 // take input from console
                 Card decidedCard = activePlayer.DecideOnCard();
-                activePlayer.PlayCard(decidedCard, defendingPlayer);
+                if (decidedCard != null)
+                {
+                    activePlayer.PlayCard(decidedCard, defendingPlayer);
+                }
             }
+        }
+
+        public void EndPhase(Player activePlayer)
+        {
+            Console.WriteLine("END PHASE");
+            Console.WriteLine();
+            SwitchActivePlayer();
+            TurnCount++;
         }
 
         public void UseCard(Card card)
@@ -111,12 +139,6 @@ namespace TcgClone
             Player defendingPlayer = GetDefendingPlayer();
 
             activePlayer.PlayCard(card, defendingPlayer);
-        }
-
-        public void EndTurn()
-        {
-            SwitchActivePlayer();
-            TurnCount++;
         }
 
         private void SwitchActivePlayer()

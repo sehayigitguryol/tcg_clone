@@ -510,6 +510,39 @@ namespace TcgClone.Tests
             Assert.Equal(3, selectedCard.Point);
         }
 
+        [Fact]
+        public void DecideOnCard_PlayerSkipsTurn_Test()
+        {
+            // Arrange
+            var playerName = "Test Player";
+            var health = 30;
+            var currentMana = 4;
+            var manaCapacity = 5;
+
+            var deck = new List<Card>
+            {
+                new Card(1),
+                new Card(2)
+            };
+
+            var hand = new List<Card>
+            {
+                new Card(3),
+                new Card(6),
+                new Card(7),
+                new Card(8),
+            };
+
+            var inputs = new List<string>() { "P" };
+            PlayerWithInput player = playerMock.CreateMockInputPlayer(4, playerName, health, currentMana, manaCapacity, deck, hand, inputs);
+
+            // Act
+            Card selectedCard = player.DecideOnCard();
+
+            // Assert 
+            Assert.Null(selectedCard);
+            Assert.Equal(4, player.Hand.Count);
+        }
         public static IEnumerable<object[]> PlayerHandAndDecisionData
         {
             get
