@@ -15,7 +15,7 @@ namespace TcgClone.Interfaces
 
         void RefillMana();
 
-        void TakeDamage(int damage);
+        void InflictDamage(int damage);
 
         void DealDamage(int damage, Player opponent);
 

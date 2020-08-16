@@ -10,14 +10,14 @@ namespace TcgClone.Tests
     {
         public List<string> Inputs { get; set; }
 
-        public PlayerWithInput(string name, List<string> inputs)
-            : base(name)
+        public PlayerWithInput(int id,string name, List<string> inputs)
+            : base(id, name)
         {
             Inputs = inputs;
         }
 
-        public PlayerWithInput(string name, int health, int mana, int manaSlots, List<Card> deck, List<Card> hand, List<string> inputs)
-         : base(name, health, mana, manaSlots, deck, hand)
+        public PlayerWithInput(int id, string name, int health, int mana, int manaSlots, List<Card> deck, List<Card> hand, List<string> inputs)
+         : base(id ,name, health, mana, manaSlots, deck, hand)
         {
             Inputs = inputs;
         }

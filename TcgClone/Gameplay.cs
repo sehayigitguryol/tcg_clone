@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TcgClone.Entities;
 using TcgClone.Events;
@@ -18,6 +19,8 @@ namespace TcgClone
         public int TurnCount { get; private set; }
 
         public bool IsGameFinished { get; private set; }
+
+        public Player WinnerPlayer { get; private set; }
 
         private readonly Random random = new Random();
 
@@ -45,6 +48,9 @@ namespace TcgClone
 
         public Gameplay(Player firstPlayer, Player secondPlayer)
         {
+            firstPlayer.HealthHandler += Player_HealthBelowZero;
+            secondPlayer.HealthHandler += Player_HealthBelowZero;
+
             PlayerList = new List<Player>()
             {
                 firstPlayer,
@@ -171,6 +177,12 @@ namespace TcgClone
         private void Player_HealthBelowZero(object sender, PlayerHealthBelowZeroEventArgs e)
         {
             IsGameFinished = true;
+
+            var loserPlayer = e.LoserPlayer;
+            WinnerPlayer = PlayerList.Where((x) => x.Id != loserPlayer.Id).First();
+
+            Console.WriteLine($"Game is over! Winner is {WinnerPlayer.Name} and {loserPlayer.Name} has lost the game.");
+            Console.WriteLine($"Game lasted for {TurnCount} turns");
         }
     }
 }

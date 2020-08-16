@@ -21,6 +21,8 @@ namespace TcgClone.Entities
 
         private readonly Random random = new Random();
 
+        public int Id { get; set; }
+
         public string Name { get; private set; }
 
         public int Health { get; set; }
@@ -33,14 +35,16 @@ namespace TcgClone.Entities
 
         public List<Card> Hand { get; set; }
 
-        public Player(string name)
+        public Player(int id, string name)
         {
+            Id = id;
             Name = name;
             InitializeDefaultPlayerProperties();
         }
 
-        public Player(string name, int health, int mana, int manaSlots, List<Card> deck, List<Card> hand)
+        public Player(int id, string name, int health, int mana, int manaSlots, List<Card> deck, List<Card> hand)
         {
+            Id = id;
             Name = name;
             Health = health;
             Mana = mana;
@@ -69,6 +73,16 @@ namespace TcgClone.Entities
             {
                 Console.WriteLine($"{Name} doesn't have any card in deck. {Name} is bleeding out.");
                 Health -= 1;
+
+                if (Health <= 0)
+                {
+                    PlayerHealthBelowZeroEventArgs args = new PlayerHealthBelowZeroEventArgs()
+                    {
+                        LoserPlayer = this,
+                    };
+
+                    OnPlayerHealthBelowZero(args);
+                }
             }
             else
             {
@@ -108,7 +122,7 @@ namespace TcgClone.Entities
             Mana = ManaCapacity;
         }
 
-        public void TakeDamage(int damage)
+        public void InflictDamage(int damage)
         {
             Health -= damage;
 
@@ -116,7 +130,7 @@ namespace TcgClone.Entities
             {
                 PlayerHealthBelowZeroEventArgs args = new PlayerHealthBelowZeroEventArgs()
                 {
-                    LoserPlayer = this
+                    LoserPlayer = this,
                 };
 
                 OnPlayerHealthBelowZero(args);
@@ -125,7 +139,7 @@ namespace TcgClone.Entities
 
         public void DealDamage(int damage, Player opponent)
         {
-            opponent.TakeDamage(damage);
+            opponent.InflictDamage(damage);
         }
 
         public Card DecideOnCard()
@@ -178,7 +192,7 @@ namespace TcgClone.Entities
             else
             {
                 Hand.Remove(card);
-                opponent.TakeDamage(card.Point);
+                DealDamage(card.Point, opponent);
                 Mana -= card.Point;
             }
         }
