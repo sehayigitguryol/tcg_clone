@@ -26,43 +26,45 @@ namespace TcgClone
 
         public Gameplay(Player firstPlayer, Player secondPlayer, int turnCount, int activePlayerIndex)
         {
-            firstPlayer.HealthHandler += Player_HealthBelowZero;
-            secondPlayer.HealthHandler += Player_HealthBelowZero;
-
             PlayerList = new List<Player>()
             {
                 firstPlayer,
                 secondPlayer
             };
 
-            TurnCount = turnCount;
-            ActivePlayerIndex = activePlayerIndex;
-            if (TurnCount == 1)
-            {
-                foreach (var player in PlayerList)
-                {
-                    player.GetStartingHand();
-                }
-            }
+            InitializeGameplayProperties(turnCount, activePlayerIndex);
         }
 
         public Gameplay(Player firstPlayer, Player secondPlayer)
         {
-            firstPlayer.HealthHandler += Player_HealthBelowZero;
-            secondPlayer.HealthHandler += Player_HealthBelowZero;
-
             PlayerList = new List<Player>()
             {
                 firstPlayer,
                 secondPlayer
             };
 
-            TurnCount = 1;
-            ActivePlayerIndex = DecideActivePlayer();
+            InitializeGameplayProperties();
+        }
+
+        public Gameplay(List<Player> players)
+        {
+            PlayerList = players;
+
+            InitializeGameplayProperties();
+        }
+
+        private void InitializeGameplayProperties(int turnCount = 1, int activePlayerIndex = -1)
+        {
+            TurnCount = turnCount;
+            ActivePlayerIndex = activePlayerIndex != -1 ? activePlayerIndex : DecideStartingPlayer();
 
             foreach (var player in PlayerList)
             {
-                player.GetStartingHand();
+                player.HealthHandler += Player_HealthBelowZero;
+                if (turnCount == 1)
+                {
+                    player.GetStartingHand();
+                }
             }
         }
 
@@ -140,7 +142,7 @@ namespace TcgClone
             return PlayerList[defendingIndex];
         }
 
-        private int DecideActivePlayer()
+        private int DecideStartingPlayer()
         {
             return random.Next(PlayerList.Count);
         }
@@ -152,7 +154,7 @@ namespace TcgClone
             Console.WriteLine($"Attacking Player Name : {attackingPlayer.Name}");
             Console.WriteLine($"Health: {attackingPlayer.Health} Mana: {attackingPlayer.Mana}");
             Console.WriteLine($"Defending Player Name : {defendingPlayer.Name}");
-            Console.WriteLine($"Health: {attackingPlayer.Health} Mana: {attackingPlayer.Mana}");
+            Console.WriteLine($"Health: {defendingPlayer.Health} Mana: {defendingPlayer.Mana}");
             Console.WriteLine("%%%%%%%%%%%%%%%%%%%%%%%%%");
             Console.WriteLine();
         }
