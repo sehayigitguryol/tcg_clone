@@ -438,7 +438,7 @@ namespace TcgClone.Tests
             PlayerWithInput player = playerMock.CreateMockInputPlayer(2, playerName, health, currentMana, manaCapacity, deck, hand, inputs);
 
             // Act
-            Card selectedCard = player.DecideOnCard();
+            var (selectedCard, _) = player.DecideOnCard();
 
             // Assert 
             Assert.Equal(2, selectedCard.Point);
@@ -471,7 +471,7 @@ namespace TcgClone.Tests
             PlayerWithInput player = playerMock.CreateMockInputPlayer(4, playerName, health, currentMana, manaCapacity, deck, hand, inputs);
 
             // Act
-            Card selectedCard = player.DecideOnCard();
+            var (selectedCard, _) = player.DecideOnCard();
 
             // Assert 
             Assert.Equal(3, selectedCard.Point);
@@ -504,7 +504,7 @@ namespace TcgClone.Tests
             PlayerWithInput player = playerMock.CreateMockInputPlayer(4, playerName, health, currentMana, manaCapacity, deck, hand, inputs);
 
             // Act
-            Card selectedCard = player.DecideOnCard();
+            var (selectedCard, _) = player.DecideOnCard();
 
             // Assert 
             Assert.Equal(3, selectedCard.Point);
@@ -537,7 +537,7 @@ namespace TcgClone.Tests
             PlayerWithInput player = playerMock.CreateMockInputPlayer(4, playerName, health, currentMana, manaCapacity, deck, hand, inputs);
 
             // Act
-            Card selectedCard = player.DecideOnCard();
+            var (selectedCard, _) = player.DecideOnCard();
 
             // Assert 
             Assert.Null(selectedCard);

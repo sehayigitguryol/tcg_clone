@@ -59,8 +59,8 @@ namespace TcgClone.Interfaces
         /// <summary>
         /// Decision of which card is played next
         /// </summary>
-        /// <returns>Decided card</returns>
-        Card DecideOnCard();
+        /// <returns>Decided card and boolean of isPassed</returns>
+        (Card, bool) DecideOnCard();
 
         /// <summary>
         /// Reading player input from console

@@ -12,16 +12,6 @@ namespace TcgClone.Entities
     /// </summary>
     public class Player : IPlayerActions
     {
-        private const int INITIAL_HAND_SIZE = 3;
-
-        private const int MAX_HAND_SIZE = 5;
-
-        private const int MAX_MANA_CAPACITY = 10;
-
-        private const int MAX_HEALTH = 30;
-
-        private readonly List<int> INITIAL_CARD_COSTS = new List<int>() { 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8 };
-
         private readonly Random random = new Random();
 
         public int Id { get; set; }
@@ -62,11 +52,11 @@ namespace TcgClone.Entities
         /// </summary>
         private void InitializeDefaultPlayerProperties()
         {
-            Health = MAX_HEALTH;
+            Health = PlayerConstants.MAX_HEALTH;
             Mana = 0;
             ManaCapacity = 0;
             Deck = new List<Card>();
-            foreach (var item in INITIAL_CARD_COSTS)
+            foreach (var item in PlayerConstants.INITIAL_CARD_COSTS)
             {
                 Deck.Add(new Card(item));
             }
@@ -108,13 +98,13 @@ namespace TcgClone.Entities
                 Deck.RemoveAt(nextCardIndex);
 
                 Console.WriteLine($"{Name} draws a card");
-                if (Hand.Count < MAX_HAND_SIZE)
+                if (Hand.Count < PlayerConstants.MAX_HAND_SIZE)
                 {
                     Hand.Add(drawedCard);
                 }
                 else
                 {
-                    Console.WriteLine($"{Name} reached the hand limit.");
+                    Console.WriteLine($"{Name} reached the hand limit. {drawedCard.Point} is discarded.");
                 }
 
             }
@@ -125,7 +115,7 @@ namespace TcgClone.Entities
         /// </summary>
         public void GetStartingHand()
         {
-            for (int i = 0; i < INITIAL_HAND_SIZE; i++)
+            for (int i = 0; i < PlayerConstants.INITIAL_HAND_SIZE; i++)
             {
                 DrawCard();
             }
@@ -136,7 +126,7 @@ namespace TcgClone.Entities
         /// </summary>
         public void IncrementManaCapacity()
         {
-            ManaCapacity = ManaCapacity < MAX_MANA_CAPACITY ? ManaCapacity + 1 : MAX_MANA_CAPACITY;
+            ManaCapacity = ManaCapacity < PlayerConstants.MAX_MANA_CAPACITY ? ManaCapacity + 1 : PlayerConstants.MAX_MANA_CAPACITY;
         }
 
         /// <summary>
@@ -184,12 +174,14 @@ namespace TcgClone.Entities
         /// If input is an integer, but player's mana is insufficent to play that card, an error message pops up. Console requires player to try again.
         /// If input is an integer and player's mana is sufficent to play that card, that card is returned.
         /// </summary>
-        /// <returns>Card that decided</returns>
-        public Card DecideOnCard()
+        /// <returns>Card that decided and true if turn is passed</returns>
+        public (Card, bool) DecideOnCard()
         {
             Card selectedCard = null;
+            bool shouldStopTry = false;
+            bool isPassed = false;
 
-            while (true)
+            while (!shouldStopTry)
             {
                 Console.WriteLine("Please enter cost of the card that you want to play. Enter P to pass your turn");
                 var input = GetPlayerInput();
@@ -197,6 +189,8 @@ namespace TcgClone.Entities
                 if (string.Compare(input, "p", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     Console.WriteLine($"{Name} passed turn");
+                    shouldStopTry = true;
+                    isPassed = true;
                     break;
                 }
 
@@ -213,6 +207,7 @@ namespace TcgClone.Entities
                         if (cardValue <= Mana)
                         {
                             selectedCard = retrievedCard;
+                            shouldStopTry = true;
                             break;
                         }
                         else
@@ -227,7 +222,7 @@ namespace TcgClone.Entities
                 }
             }
 
-            return selectedCard;
+            return (selectedCard, isPassed);
         }
 
         /// <summary>
@@ -257,10 +252,11 @@ namespace TcgClone.Entities
             else
             {
                 Hand.Remove(card);
+                Console.WriteLine($"{card.Point} damage has given to {opponent.Name}");
+
                 DealDamage(card.Point, opponent);
                 Mana -= card.Point;
 
-                Console.WriteLine($"{card.Point}  damage has given to {opponent.Name}");
                 Console.WriteLine();
             }
         }

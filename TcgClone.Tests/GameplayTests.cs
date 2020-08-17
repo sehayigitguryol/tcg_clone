@@ -190,8 +190,8 @@ namespace TcgClone.Tests
         public void EndTurn_ActivePlayerSwitches_Test()
         {
             // Arrange
-            Player player1 = PlayerMock.CreateMockPlayerWithName(1,"Player A");
-            Player player2 = PlayerMock.CreateMockPlayerWithName(2,"Player B");
+            Player player1 = PlayerMock.CreateMockPlayerWithName(1, "Player A");
+            Player player2 = PlayerMock.CreateMockPlayerWithName(2, "Player B");
 
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 1, 0);
 
@@ -235,9 +235,13 @@ namespace TcgClone.Tests
             Player player2 = PlayerMock.CreateMockPlayerWithName(2, "Defending");
             Gameplay game = GameplayMock.CreateMockGameplayWithDecidedSides(player1, player2, 2, 0);
 
+            Player attacking = game.GetActivePlayer();
+            Player defending = game.GetDefendingPlayer();
+
             // Act
-            game.UseCard(card20);
-            game.UseCard(card10);
+
+            game.UseCard(card20, attacking, defending);
+            game.UseCard(card10, attacking, defending);
 
             // Assert
             Assert.Equal(50, player1.Mana);

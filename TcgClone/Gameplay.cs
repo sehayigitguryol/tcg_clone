@@ -53,10 +53,15 @@ namespace TcgClone
             InitializeGameplayProperties();
         }
 
+        /// <summary>
+        /// Initializes gameplay properties, subscribes health below zero event. If turn count is 1, every player draws their starting hand.
+        /// </summary>
+        /// <param name="turnCount">Current turn count</param>
+        /// <param name="activePlayerIndex">Index of player that owns current turn</param>
         private void InitializeGameplayProperties(int turnCount = 1, int activePlayerIndex = -1)
         {
             TurnCount = turnCount;
-            ActivePlayerIndex = activePlayerIndex != -1 ? activePlayerIndex : DecideStartingPlayer();
+            ActivePlayerIndex = activePlayerIndex != -1 ? activePlayerIndex : DetermineStartingPlayerIndex();
 
             foreach (var player in PlayerList)
             {
@@ -68,6 +73,10 @@ namespace TcgClone
             }
         }
 
+        /// <summary>
+        /// Executes the game till a player's health goes down to zero.
+        /// Each turn consists of 3 phases: Start, Action and End
+        /// </summary>
         public void RunGame()
         {
             while (!IsGameFinished)
@@ -80,7 +89,12 @@ namespace TcgClone
                 EndPhase(activePlayer);
             }
         }
-
+        /// <summary>
+        /// Start phase of the turn. Mana capacity of active palyer is increased and mana is refilled.
+        /// If this is not the first turn, player draws a card.
+        /// </summary>
+        /// <param name="activePlayer">Player that owns the turn</param>
+        /// <param name="defendingPlayer">Player that receives the consequences of the turn</param>
         public void StartPhase(Player activePlayer, Player defendingPlayer)
         {
             Console.WriteLine($"Now it's {activePlayer.Name}'s turn");
@@ -101,6 +115,12 @@ namespace TcgClone
             PrintTurnBeginningStats(activePlayer, defendingPlayer);
         }
 
+        /// <summary>
+        /// Action phase of the turn. If player has any card to play in the hand, player is asked to decide either play or not.
+        /// If player has no available card in the hand, turn is passed.
+        /// </summary>
+        /// <param name="activePlayer">Player that owns the turn</param>
+        /// <param name="defendingPlayer">Player that receives the consequences of the turn</param>
         public void ActionPhase(Player activePlayer, Player defendingPlayer)
         {
             Console.WriteLine("ACTION PHASE");
@@ -114,17 +134,28 @@ namespace TcgClone
                 Console.WriteLine();
             }
 
-            while (activePlayer.CanPlayAnyMove())
+            bool shouldEndPhase = false;
+
+            while (activePlayer.CanPlayAnyMove() && !shouldEndPhase && !IsGameFinished)
             {
                 // take input from console
-                Card decidedCard = activePlayer.DecideOnCard();
+                var (decidedCard, isPassed) = activePlayer.DecideOnCard();
                 if (decidedCard != null)
                 {
                     activePlayer.PlayCard(decidedCard, defendingPlayer);
                 }
+
+                if (isPassed)
+                {
+                    shouldEndPhase = true;
+                }
             }
         }
 
+        /// <summary>
+        /// End phase of the turn. Active player is switched inside
+        /// </summary>
+        /// <param name="activePlayer"></param>
         public void EndPhase(Player activePlayer)
         {
             Console.WriteLine("END PHASE");
@@ -133,14 +164,20 @@ namespace TcgClone
             TurnCount++;
         }
 
-        public void UseCard(Card card)
+        /// <summary>
+        /// Method for using card by attackingPlayer towards to defendingPlayer
+        /// </summary>
+        /// <param name="card">Card is wanted to use</param>
+        /// <param name="attackingPlayer">Attacking player</param>
+        /// <param name="defendingPlayer">Defending player</param>
+        public void UseCard(Card card, Player attackingPlayer, Player defendingPlayer)
         {
-            Player activePlayer = GetActivePlayer();
-            Player defendingPlayer = GetDefendingPlayer();
-
-            activePlayer.PlayCard(card, defendingPlayer);
+            attackingPlayer.PlayCard(card, defendingPlayer);
         }
 
+        /// <summary>
+        /// Switching active player, since, for now, there are 2 players in the game.
+        /// </summary>
         private void SwitchActivePlayer()
         {
             if (ActivePlayerIndex == 0)
@@ -153,6 +190,7 @@ namespace TcgClone
             }
         }
 
+
         public Player GetActivePlayer()
         {
             return PlayerList[ActivePlayerIndex];
@@ -164,7 +202,11 @@ namespace TcgClone
             return PlayerList[defendingIndex];
         }
 
-        private int DecideStartingPlayer()
+        /// <summary>
+        /// Determining which player starts first. Each player has equal chance to start
+        /// </summary>
+        /// <returns>Active player index</returns>
+        private int DetermineStartingPlayerIndex()
         {
             return random.Next(PlayerList.Count);
         }
@@ -205,6 +247,7 @@ namespace TcgClone
             var loserPlayer = e.LoserPlayer;
             WinnerPlayer = PlayerList.Where((x) => x.Id != loserPlayer.Id).First();
 
+            Console.WriteLine();
             Console.WriteLine($"Game is over! Winner is {WinnerPlayer.Name} and {loserPlayer.Name} has lost the game.");
             Console.WriteLine($"Game lasted for {TurnCount} turns");
         }
